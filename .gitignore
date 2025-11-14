@@ -1,0 +1,7 @@
+# Node modules
+frontend/node_modules/
+backend/node_modules/
+
+# Python
+*.pyc
+__pycache__/
