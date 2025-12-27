@@ -8,7 +8,7 @@ function Header() {
 		<Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
 			<Container>
 				<LinkContainer to="/">
-					<Navbar.Brand>WhiteLabelShop</Navbar.Brand>
+					<Navbar.Brand>WhitelabelShop</Navbar.Brand>
 				</LinkContainer>
 				
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
