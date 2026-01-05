@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useParams, useNavigate  } from 'react-router-dom'
 import { Link } from 'react-router-dom'
-import { useParams } from 'react-router-dom'
 import { Row, Col, Image, ListGroup, Button, Card, Form, ListGroupItem } from 'react-bootstrap'
 import Rating from '../components/Rating'
 import Loader from '../components/Loader'
@@ -12,6 +12,7 @@ import { listProductDetails } from '../actions/productActions'
 function ProductScreen() {
     const [qty, setQty] = useState(1)
 
+    const navigate = useNavigate()
     const dispatch = useDispatch()
     const { id } = useParams()
     const productDetails = useSelector(state => state.productDetails)
@@ -19,9 +20,9 @@ function ProductScreen() {
     useEffect(() => {
         dispatch(listProductDetails(id))
     }, [dispatch, id])
-
+    
     const addToCardHandler = () => {
-        window.location.href = `/cart/${id}?qty=${qty}`
+        navigate(`/cart/${id}?qty=${qty}`)
     }
     return (
     <div>
