@@ -1,10 +1,12 @@
 from typing import Any
 from django.shortcuts import render
 from django.http import JsonResponse
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 from .models import Product 
+from django.contrib.auth.models import User
 from .products import products
 from .serializers import ProductSerializer, UserSerializer, UserSerializerWithToken
 
@@ -36,6 +38,7 @@ def getRouter(request):
 
 
 @api_view (['GET'])
+@permission_classes([IsAuthenticated])
 def getUserProfile(request):
     """
     Returns the profile information of the currently authenticated user.
@@ -43,6 +46,13 @@ def getUserProfile(request):
     user = request.user # get authenticated user from request (via Token)
     serializer = UserSerializer(user, many=False) # serialize a single user object
     return Response(serializer.data) # return data as a JSON object
+
+@api_view (['GET'])
+@permission_classes([IsAdminUser])
+def getUsers(request):
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
 
 
 @api_view (['GET'])
