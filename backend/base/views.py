@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from .models import Product 
 from .products import products
-from .serializers import ProductSerializer, UserSerializer
+from .serializers import ProductSerializer, UserSerializer, UserSerializerWithToken
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -17,12 +17,12 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs: dict[str, Any]) -> dict[str, str]:
-        # 1. Call the parent method to generate the standard Tokens (Access & Refresh)
-        data = super().validate(attrs)
+        data = super().validate(attrs) # Get standard tokens (access/refresh)
         
-        # 2. Add custom user data to the response (Extra info for React)
-        data["username"] = self.user.username
-        data["email"] = self.user.email
+        # Serialize user object with our custom fields (name, isAdmin, etc.)
+        serializer = UserSerializerWithToken(self.user).data
+        for k, v in serializer.items(): # Loop through user data
+            data[k] = v # Add each field to the final response
 
         return data
     
