@@ -41,9 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    "base",
     "corsheaders",
     "rest_framework",
+    "base.apps.BaseConfig",
 ]
 
 REST_FRAMEWORK = {
