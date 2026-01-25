@@ -48,6 +48,28 @@ def registerUser(request):
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
     
 
+@api_view (['PUT'])
+@permission_classes([IsAuthenticated])
+def updateUserProfile(request):
+    """
+    Updates the profile information of the currently authenticated user.
+    """
+    user = request.user # get authenticated user from request (via Token)
+    serializer = UserSerializerWithToken(user, many=False)
+    
+    # request.data contains the parsed content of the request body (JSON sent from React)
+    data = request.data
+
+    user.first_name = data['name']
+    user.email = data['email']
+    user.username = data['email']
+    if data['password'] != '':
+        user.password = make_password(data['password'])
+    user.save()
+
+    return Response(serializer.data) # return data as a JSON object
+
+
 @api_view (['GET'])
 @permission_classes([IsAuthenticated])
 def getUserProfile(request):
