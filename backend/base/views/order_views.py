@@ -58,5 +58,5 @@ def addOrderItems(request):
             product.countInStock -= item.qty
             product.save()
 
-        serializer = OrderSerializer(order, many=True)
+        serializer = OrderSerializer(order, many=False)
         return Response(serializer.data)
