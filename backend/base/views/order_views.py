@@ -8,6 +8,7 @@ from base.models import Product, Order, OrderItem, ShippingAddress
 from base.serializers import ProductSerializer, OrderSerializer
 
 from rest_framework import status
+from django.utils import timezone
 
 
 @api_view (['POST'])
@@ -80,3 +81,41 @@ def getOrderById(request, pk):
             return Response({'detail': 'Not authorized to view this order'}, status=status.HTTP_403_FORBIDDEN)
     except Order.DoesNotExist:
         return Response({'detail': 'Order does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view (['PUT'])
+@permission_classes([IsAuthenticated])    
+def updateOrderToPaid(request, pk):
+    try:
+        # 1. Fetch the order by primary key
+        order = Order.objects.get(_id=pk)
+        
+        # 2. Check if the authenticated user owns this order
+        if order.user != request.user:
+            return Response(
+                {'detail': 'Not authorized to view this order'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # 3. Update payment status
+        order.isPaid = True
+        order.paidAt = timezone.now()
+        order.save()
+
+        # 4. Return the updated order object
+        serializer = OrderSerializer(order, many=False)
+        return Response(serializer.data)
+
+    except Order.DoesNotExist:
+        # If order ID is not found
+        return Response(
+            {'detail': 'Order does not exist'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    except Exception as e:
+        # Handle any other unexpected errors
+        return Response(
+            {'detail': str(e)}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
