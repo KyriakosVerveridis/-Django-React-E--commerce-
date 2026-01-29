@@ -86,7 +86,48 @@ def getUserProfile(request):
 def getUsers(request):
     users = User.objects.all()
     serializer = UserSerializer(users, many=True)
-    return Response(serializer.data)    
+    return Response(serializer.data)
+
+
+@api_view (['GET'])
+@permission_classes([IsAdminUser])
+def getUserById(request, pk):
+    user = User.objects.get(id=pk)
+    serializer = UserSerializer(user, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def updateUser(request, pk):
+    try:
+        # Fetch the user by primary key
+        user = User.objects.get(id=pk)
+        data = request.data
+
+        # If a field is missing from the request, use the current user value as a fallback
+        user.first_name = data.get('name', user.first_name)
+        user.email = data.get('email', user.email)
+        user.username = data.get('email', user.username) # Syncing username with email
+        user.is_staff = data.get('isAdmin', user.is_staff)
+
+        user.save()
+        
+        serializer = UserSerializer(user, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        # Return 404 if the user ID is invalid
+        return Response(
+            {'detail': 'User not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        # Catch any other unexpected errors to prevent a 500 status code
+        return Response(
+            {'detail': f'An error occurred: {str(e)}'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 @api_view (['DELETE'])
