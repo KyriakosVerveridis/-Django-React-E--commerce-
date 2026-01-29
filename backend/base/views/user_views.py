@@ -92,6 +92,22 @@ def getUsers(request):
 @api_view (['DELETE'])
 @permission_classes([IsAdminUser])
 def deleteUser(request, pk):
-    userForDelete = User.objects.get(id=pk)
-    userForDelete.delete()
-    return Response('User was deleted')    
+    try:
+        # Attempt to find the user by primary key (id)
+        userForDelete = User.objects.get(id=pk)
+        userForDelete.delete()
+        return Response({'detail': 'User was deleted successfully'}, status=status.HTTP_200_OK)
+    
+    except User.DoesNotExist:
+        # Handle the case where the user ID is not found in the database
+        return Response(
+            {'detail': 'User with this ID does not exist'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+        
+    except Exception as e:
+        # Catch any other unexpected errors
+        return Response(
+            {'detail': f'An unexpected error occurred: {str(e)}'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
