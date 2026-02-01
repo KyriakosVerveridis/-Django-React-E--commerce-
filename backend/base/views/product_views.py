@@ -31,3 +31,15 @@ def getProduct(request, pk):
     product = Product.objects.get(_id=pk) # get product from DB
     serializer = ProductSerializer(product, many=False) # serialize a single object
     return Response(serializer.data)
+
+
+@api_view (['DELETE'])
+@permission_classes([IsAdminUser])  
+def deleteProduct(request, pk):
+    """
+    Function to delete a specific product by ID.
+    """
+    productToDelete = Product.objects.get(_id=pk)
+    productToDelete.delete()
+    
+    return Response('Product deleted')
