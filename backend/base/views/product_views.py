@@ -33,6 +33,44 @@ def getProduct(request, pk):
     return Response(serializer.data)
 
 
+@api_view(['PUT', 'PATCH'])
+@permission_classes([IsAdminUser])
+def updateProduct(request, pk):
+    product = Product.objects.get(_id=pk)
+    data = request.data
+
+    product.name = data.get('name', product.name)
+    product.price = data.get('price', product.price)
+    product.brand = data.get('brand', product.brand)
+    product.countInStock = data.get('countInStock', product.countInStock)
+    product.category = data.get('category', product.category)
+    product.description = data.get('description', product.description)
+
+    product.save()
+    serializer = ProductSerializer(product, many=False)
+    return Response(serializer.data)
+
+
+@api_view (['POST'])
+@permission_classes([IsAdminUser])
+def createProduct(request):
+    user = request.user
+    data = request.data
+
+    product = Product.objects.create(
+        user=user,
+        name=data.get('name', 'Default Name'),
+        price=data.get('price', 0),
+        brand=data.get('brand', 'Default Brand'),
+        countInStock=data.get('countInStock', 0),
+        category=data.get('category', 'Default Category'),
+        description=data.get('description', '')
+    )
+    
+    serializer = ProductSerializer(product, many=False)
+    return Response(serializer.data)
+
+
 @api_view (['DELETE'])
 @permission_classes([IsAdminUser])  
 def deleteProduct(request, pk):
@@ -46,6 +84,7 @@ def deleteProduct(request, pk):
 
 
 @api_view (['POST'])
+@permission_classes([IsAdminUser]) 
 def uploadImage(request):
     """
     Function to handle image upload for products.
