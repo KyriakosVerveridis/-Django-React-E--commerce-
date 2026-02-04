@@ -34,6 +34,7 @@ def getProduct(request, pk):
 
 
 @api_view(['PUT', 'PATCH'])
+@permission_classes([IsAdminUser])
 def updateProduct(request, pk):
     product = Product.objects.get(_id=pk)
     data = request.data
@@ -81,3 +82,19 @@ def deleteProduct(request, pk):
     
     return Response('Product deleted')
 
+
+@api_view (['POST'])
+@permission_classes([IsAdminUser]) 
+def uploadImage(request):
+    """
+    Function to handle image upload for products.
+    """
+    data = request.data
+
+    product_id = data.get('product_id')
+    product = Product.objects.get(_id=product_id)
+
+    product.image = request.FILES.get('image')
+    product.save()
+
+    return Response('Image was uploaded')

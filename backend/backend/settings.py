@@ -177,14 +177,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+# Static files (CSS, JavaScript, Images that you provide as a developer)
 STATIC_URL = 'static/'
-MEDIA_URL = '/images/'
-
 STATICFILES_DIRS = [
-    BASE_DIR / 'static'
+    BASE_DIR / 'static',
 ]
+# STATIC_ROOT is used for production (when running collectstatic)
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-MEDIA_ROOT = "static/images"
-
+# Media files (User-uploaded files, like product images)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media' 
+# CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
 
