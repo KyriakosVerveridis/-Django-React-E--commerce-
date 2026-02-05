@@ -70,6 +70,17 @@ def getMyOrders(request):
     orders = user.order_set.all()
     serializer = OrderSerializer(orders, many=True)
     return Response(serializer.data)   
+
+
+@api_view (['GET'])
+@permission_classes([IsAdminUser])
+def getOrders(request):
+    """
+    Function to fetch all orders.
+    """
+    orders = Order.objects.all()
+    serializer = OrderSerializer(orders, many=True)
+    return Response(serializer.data)
     
 
 @api_view (['GET'])
