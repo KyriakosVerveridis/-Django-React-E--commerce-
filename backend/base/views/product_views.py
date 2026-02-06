@@ -16,7 +16,7 @@ from rest_framework import status
 @api_view (['GET'])
 def getProducts(request):
     """
-    Function to fetch all products.
+    Endpoint to fetch all products.
     """
     products = Product.objects.all() # get all products from DB
     serializer = ProductSerializer(products, many=True) # serialize a list of objects
@@ -26,7 +26,7 @@ def getProducts(request):
 @api_view (['GET'])
 def getProduct(request, pk):
     """
-    Function to fetch a specific product by ID.
+    Endpoint to fetch a specific product by ID.
     """
     product = Product.objects.get(_id=pk) # get product from DB
     serializer = ProductSerializer(product, many=False) # serialize a single object
@@ -75,7 +75,7 @@ def createProduct(request):
 @permission_classes([IsAdminUser])  
 def deleteProduct(request, pk):
     """
-    Function to delete a specific product by ID.
+    Endpoint to delete a specific product by ID.
     """
     productToDelete = Product.objects.get(_id=pk)
     productToDelete.delete()
@@ -87,7 +87,7 @@ def deleteProduct(request, pk):
 @permission_classes([IsAdminUser]) 
 def uploadImage(request):
     """
-    Function to handle image upload for products.
+    Endpoint to handle image upload for products.
     """
     data = request.data
 
