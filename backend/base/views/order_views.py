@@ -15,7 +15,7 @@ from django.utils import timezone
 @permission_classes([IsAuthenticated])
 def addOrderItems(request):
     """
-    Function to add order items to the database.
+    Endpoint to add order items to the database.
     """
     user = request.user
     data = request.data
@@ -76,7 +76,7 @@ def getMyOrders(request):
 @permission_classes([IsAdminUser])
 def getOrders(request):
     """
-    Function to fetch all orders.
+    Endpoint to fetch all orders.
     """
     orders = Order.objects.all()
     serializer = OrderSerializer(orders, many=True)
@@ -87,7 +87,7 @@ def getOrders(request):
 @permission_classes([IsAuthenticated])
 def getOrderById(request, pk):
     """
-    Function to get order by ID.
+    Endpoint to get order by ID.
     """
     user = request.user
 
@@ -139,3 +139,26 @@ def updateOrderToPaid(request, pk):
             {'detail': str(e)}, 
             status=status.HTTP_400_BAD_REQUEST
         )
+     
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser]) # Μόνο Admin/Staff μπορεί να παραδώσει
+def updateOrderToDelivered(request, pk):
+    """
+    Endpoint to update the delivery status of an order by Admin.
+    """
+    try:
+        order = Order.objects.get(_id=pk)
+
+        order.isDelivered = True
+        order.deliveredAt = timezone.now()
+        order.save()
+
+        serializer = OrderSerializer(order, many=False)
+        return Response(serializer.data)
+
+    except Order.DoesNotExist:
+        return Response(
+            {'detail': 'Order does not exist'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )         
