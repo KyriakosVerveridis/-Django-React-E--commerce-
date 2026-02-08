@@ -7,10 +7,10 @@ urlpatterns = [
     path('create/', views.createProduct, name='create-product'),
     path('upload/', views.uploadImage, name='product-image-upload'),
 
-    path('update/<str:pk>/', views.updateProduct, name='update-product'),
+    
+    path('<str:pk>/review/', views.createProductReview, name='create-product-review'),
     path('<str:pk>/', views.getProduct, name='product'),
     
-    path('<str:pk>/', views.getProduct, name='product'),
     path('update/<str:pk>/', views.updateProduct, name='update-product'),
     path('delete/<str:pk>/', views.deleteProduct, name='delete-product'),
 ]
