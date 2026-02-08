@@ -18,7 +18,10 @@ def getProducts(request):
     """
     Endpoint to fetch all products.
     """
-    products = Product.objects.all() # get all products from DB
+    query = request.query_params.get('keyword')
+    if query == None:
+        query = ''
+    products = Product.objects.filter(name__icontains=query) # get products from DB with name containing the query
     serializer = ProductSerializer(products, many=True) # serialize a list of objects
     return Response(serializer.data)
 
