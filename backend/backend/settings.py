@@ -13,22 +13,33 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-load_dotenv()  # Load environment variables from .env file
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# 1. ΠΡΩΤΑ διαβάζουμε το περιβάλλον από το σύστημα (terminal)
+env_type = os.environ.get('DJANGO_ENV', 'local')
+print(f"DEBUG: System says env_type is -> {env_type}")
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+# 2. Μετά επιλέγουμε το αρχείο
+if env_type == 'production':
+    env_path = BASE_DIR / '.env.production'
+else:
+    env_path = BASE_DIR / '.env.dev'
+
+# 3. Φορτώνουμε τις μεταβλητές ΚΑΙ κάνουμε override ό,τι υπάρχει ήδη
+load_dotenv(env_path, override=True)
+
+# 4. Επαλήθευση ότι το DB_HOST άλλαξε
+print(f"DEBUG: Database Host is now -> {os.getenv('DB_HOST')}")
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG') == 'True'
+# ALLOWED_HOSTS defines which domain/IP names this Django site can serve.
+# In production, this should be restricted to your EC2 IP or Domain Name.
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
 
-ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -135,10 +146,21 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'whitelabel_shop'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
