@@ -130,7 +130,7 @@ def uploadImage(request):
     product.image = request.FILES.get('image')
     product.save()
 
-    return Response('Image was uploaded')
+    return Response({'message': 'Image was uploaded', 'image_url': product.image.url})
 
 
 @api_view (['POST'])

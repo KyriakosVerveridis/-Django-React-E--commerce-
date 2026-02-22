@@ -11,3 +11,4 @@ docs
 .env.production
 .env.dev
 media
+staticfiles
