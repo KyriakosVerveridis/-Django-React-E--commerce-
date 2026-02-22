@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 
     "corsheaders",
     "rest_framework",
+    "storages",
     "base.apps.BaseConfig",
 ]
 
@@ -199,17 +200,55 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-# Static files (CSS, JavaScript, Images that you provide as a developer)
+# --- STATIC & MEDIA SETTINGS ---
+
+# 1. Base Static Files Settings (CSS, JS)
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
-# STATIC_ROOT is used for production (when running collectstatic)
-# STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Media files (User-uploaded files, like product images)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media' 
-# CORS settings
+# 2. AWS Credentials
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = 'eu-north-1'
+
+# 3. Storage Backend Selection
+if AWS_STORAGE_BUCKET_NAME:
+    print("--- STORAGE SYSTEM IS SET TO S3 ---")
+    
+    # Configuration for Django
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+
+    # Custom Domain for proper URL generation
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+    
+    # Security & Behavior settings
+    AWS_DEFAULT_ACL = None  # Important for modern S3 buckets
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_SIGNATURE_VERSION = 's3v4' # Mandatory for the eu-north-1 region
+
+else:
+    print("--- STORAGE SYSTEM IS SET TO LOCAL ---")
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+
+# CORS
 CORS_ALLOW_ALL_ORIGINS = True
-
