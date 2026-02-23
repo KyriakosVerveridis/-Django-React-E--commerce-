@@ -9,6 +9,7 @@ django-storages==1.14.6
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
 fonttools==4.60.1
+gunicorn==25.1.0
 jmespath==1.0.1
 kiwisolver==1.4.9
 matplotlib==3.10.6
@@ -25,3 +26,4 @@ six==1.17.0
 sqlparse==0.5.3
 tzdata==2025.2
 urllib3==2.5.0
+whitenoise==6.11.0
