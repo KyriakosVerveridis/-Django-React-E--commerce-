@@ -17,28 +17,36 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 1. ΠΡΩΤΑ διαβάζουμε το περιβάλλον από το σύστημα (terminal)
+# FIRST, read the environment from the system (terminal)
 env_type = os.environ.get('DJANGO_ENV', 'local')
 print(f"DEBUG: System says env_type is -> {env_type}")
 
-# 2. Μετά επιλέγουμε το αρχείο
+# DEBUG is True if env_type is not 'production'
+DEBUG = (env_type != 'production')
+
+# Determine which .env file to use based on the environment type
 if env_type == 'production':
     env_path = BASE_DIR / '.env.production'
 else:
     env_path = BASE_DIR / '.env.dev'
+    
 
-# 3. Φορτώνουμε τις μεταβλητές ΚΑΙ κάνουμε override ό,τι υπάρχει ήδη
-load_dotenv(env_path, override=True)
+if env_path.exists():
+    load_dotenv(env_path, override=True)
+    print(f"DEBUG: Loaded variables from {env_path}")
+else:
+    print(f"DEBUG: No .env file found at {env_path}. Reading from system environment.")    
 
-# 4. Επαλήθευση ότι το DB_HOST άλλαξε
+# Verify that DB_HOST has changed
 print(f"DEBUG: Database Host is now -> {os.getenv('DB_HOST')}")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-# ALLOWED_HOSTS defines which domain/IP names this Django site can serve.
-# In production, this should be restricted to your EC2 IP or Domain Name.
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
+# Convert the comma-separated string of hosts from the environment into a Python list.
+# If no environment variable is set, it defaults to local development addresses.
+allowed_hosts_env = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost')
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',') if host]
 
 
 
@@ -114,8 +122,9 @@ SIMPLE_JWT = {
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -251,4 +260,10 @@ else:
     MEDIA_ROOT = BASE_DIR / 'media'
 
 # CORS
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+if env_type == 'production':
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
