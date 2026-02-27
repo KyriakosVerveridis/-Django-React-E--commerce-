@@ -19,6 +19,8 @@ from django.urls import path, include
 
 from django.conf import settings
 from django.conf.urls.static import static
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from rest_framework.permissions import IsAdminUser
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,6 +28,10 @@ urlpatterns = [
     path('api/products/', include('base.urls.product_urls')),
     path('api/users/', include('base.urls.user_urls')),
     path('api/orders/', include('base.urls.order_urls')),
+
+    # API schema and documentation
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]
 
 # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

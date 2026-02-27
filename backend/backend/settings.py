@@ -64,12 +64,25 @@ INSTALLED_APPS = [
     "rest_framework",
     "storages",
     "base.apps.BaseConfig",
+    "drf_spectacular",
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# --- DRF SPECTACULAR SETTINGS ---
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Whitelabelshop – Django REST API (E-commerce Backend)',
+    'DESCRIPTION': 'API documentation for the E-commerce Backend',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    
+    'COMPONENT_SPLIT_REQUEST': True,
+    'COMPONENT_NO_READ_ONLY_REQUIRED': True,
 }
 
 from datetime import timedelta
