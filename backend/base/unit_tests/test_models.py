@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from base.models import Product, Order, OrderItem, ShippingAddress, Review
+from base.models import Product
 
 class ProductModelTest(TestCase):
     def setUp(self):
