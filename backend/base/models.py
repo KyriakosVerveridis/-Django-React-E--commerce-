@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator
 
 
 # Create your models here.
@@ -14,12 +15,15 @@ class Product(models.Model):
     rating = models.DecimalField(max_digits=7, decimal_places=2,null=True, blank=True)
     numReviews = models.IntegerField(null=True, blank=True, default=0)
     price = models.DecimalField(max_digits=7, decimal_places=2,null=True, blank=True)
-    countInStock = models.IntegerField(null=True, blank=True, default=0)
+    countInStock = models.IntegerField(null=True, blank=True, default=0, validators=[MinValueValidator(0)])
     createdAt = models.DateTimeField(auto_now_add=True)
     _id = models.AutoField(primary_key=True, editable=False)
 
     def __str__(self):
-        return self.name
+        return self.name if self.name else "Unnamed Product"
+    
+    class Meta:
+        ordering = ['-createdAt']
 
 
 class Review(models.Model):

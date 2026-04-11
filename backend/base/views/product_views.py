@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.shortcuts import render
 
 from rest_framework.decorators import api_view, permission_classes
@@ -84,24 +85,54 @@ def updateProduct(request, pk):
     return Response(serializer.data)
 
 
-@api_view (['POST'])
+# @api_view (['POST'])
+# @permission_classes([IsAdminUser])
+# def createProduct(request):
+#     user = request.user
+#     data = request.data
+
+#     product = Product.objects.create(
+#         user=user,
+#         name=data.get('name', 'Default Name'),
+#         price=data.get('price', 0),
+#         brand=data.get('brand', 'Default Brand'),
+#         countInStock=data.get('countInStock', 0),
+#         category=data.get('category', 'Default Category'),
+#         description=data.get('description', '')
+#     )
+    
+#     serializer = ProductSerializer(product, many=False)
+#     return Response(serializer.data)
+@api_view(['POST'])
 @permission_classes([IsAdminUser])
 def createProduct(request):
     user = request.user
     data = request.data
 
-    product = Product.objects.create(
-        user=user,
-        name=data.get('name', 'Default Name'),
-        price=data.get('price', 0),
-        brand=data.get('brand', 'Default Brand'),
-        countInStock=data.get('countInStock', 0),
-        category=data.get('category', 'Default Category'),
-        description=data.get('description', '')
-    )
-    
-    serializer = ProductSerializer(product, many=False)
-    return Response(serializer.data)
+    try:
+        # Δημιουργία αντικειμένου (instantiation) χωρίς αποθήκευση ακόμα
+        product = Product(
+            user=user,
+            name=data.get('name', 'Default Name'),
+            price=data.get('price', 0),
+            brand=data.get('brand', 'Default Brand'),
+            countInStock=data.get('countInStock', 0),
+            category=data.get('category', 'Default Category'),
+            description=data.get('description', '')
+        )
+        
+        # Εδώ τρέχουν οι Validators του models.py (π.χ. MinValueValidator)
+        product.full_clean()
+        product.save()
+
+        serializer = ProductSerializer(product, many=False)
+        return Response(serializer.data)
+
+    except ValidationError as e:
+        # Επιστρέφει 400 Bad Request αν οι validators βρουν πρόβλημα
+        return Response({'detail': e.message_dict}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view (['DELETE'])
