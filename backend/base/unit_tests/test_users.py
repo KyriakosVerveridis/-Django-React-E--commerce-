@@ -60,3 +60,40 @@ class UserAPIViewTest(APITestCase):
         # Check that the response is successful and returns the correct email
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['email'], 'test@test.com')
+
+
+from rest_framework.test import APITestCase
+from rest_framework import status
+from django.contrib.auth.models import User
+
+class UserTests(APITestCase):
+
+    def setUp(self):
+        self.user_data = {
+            'username': 'testuser@gmail.com',
+            'email': 'testuser@gmail.com',
+            'password': 'password123',
+            'name': 'Test User'
+        }
+        self.user = User.objects.create_user(
+            username=self.user_data['username'],
+            email=self.user_data['email'],
+            password=self.user_data['password']
+        )
+
+    def test_login_success(self):
+        """Test that a user can login and receive a token"""
+        url = '/api/users/login/'
+        data = {
+            'username': self.user_data['username'],
+            'password': self.user_data['password']
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('token', response.data)
+
+    def test_get_user_profile_unauthorized(self):
+        """Test that profile access is denied without login"""
+        url = '/api/users/profile/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)        
