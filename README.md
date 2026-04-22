@@ -1,6 +1,6 @@
 # 🛒 WHITELABELSHOP - E-commerce API
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://whitelabel-shop-2c8c21e0d0c0.herokuapp.com/api/products/)
+[![API Docs](https://img.shields.io/badge/Swagger-API_Docs-blue?style=for-the-badge)](https://whitelabel-shop-2c8c21e0d0c0.herokuapp.com/api/docs/)
 
 Backend infrastructure built with **Django 5.x** and **DRF**, deployed on **Heroku** with **AWS** integration.
 
@@ -9,13 +9,16 @@ Backend infrastructure built with **Django 5.x** and **DRF**, deployed on **Hero
 * **Database:** PostgreSQL (AWS RDS)
 * **Storage:** AWS S3 (Media & Static files via `boto3`)
 * **Auth:** JWT (SimpleJWT)
-* **API Docs:** Swagger UI (OpenAPI 3.0) - *In Progress*
+* **API Docs:** Swagger UI (OpenAPI 3.0)
+* **Testing:** Django TestCase / UnitTest
 
 ## 🚀 Architecture Highlights
 * **S3 Persistence:** AWS S3 integration for media storage (required for Heroku's ephemeral filesystem).
 * **Decoupled Database:** PostgreSQL hosted on AWS RDS for persistence and scalability.
 * **Frontend-Ready:** Specifically configured for React/Redux consumption (CORS, JWT, structured JSON).
 * **Core Logic:** Order processing logic with stock updates and data consistency handling.
+* **Interactive Documentation:** Fully integrated Swagger UI for real-time API testing.
+* **Docker Ready:** Containerized environment for consistent development.
 
 ## 🔗 Core Endpoints (Showcase)
 | Method | Endpoint | Description | Auth |
@@ -26,7 +29,6 @@ Backend infrastructure built with **Django 5.x** and **DRF**, deployed on **Hero
 | `POST` | `/api/products/upload/` | Secure Media Upload to S3 | **Admin** |
 | `POST` | `/api/orders/add/` | Order Logic & Stock Update | **JWT** |
 
-> **🚧 Documentation Update:** **Swagger UI** integration is underway. Interactive API documentation will soon be accessible.
 
 ## ⚙️ Local Setup
 ```bash
@@ -34,23 +36,24 @@ Backend infrastructure built with **Django 5.x** and **DRF**, deployed on **Hero
 git clone https://github.com/KyriakosVerveridis/-Django-React-E--commerce-.git
 
 # 2. Enter directory
-cd -Django-React-E--commerce-/backend
+cd ./-Django-React-E--commerce-
 
-# 3. Setup environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+# 3. Spin up the containers (Environment variables are handled via .env.dev)
+docker-compose --env-file ./backend/.env.dev up --build
 
-# 4. Run
-python manage.py migrate
-python manage.py runserver
+# 4. Run database migrations (inside the container)
+docker-compose exec backend python manage.py migrate
 
-👤 Author
+# 5. Run Tests
+docker-compose exec backend python manage.py test
+```
 
-Kyriakos Ververidis
-Backend Python Developer
-Greece-Open to Remote
-ververidiskyriakos@gmail.com|https://www.linkedin.com/in/kyriakos-ververidis/
+## 👤 Author
+
+**Kyriakos Ververidis** *Backend Python Developer* 📍 Greece (Open to Remote)
+
+📧 [ververidiskyriakos@gmail.com](mailto:ververidiskyriakos@gmail.com)  
+🔗 [LinkedIn Profile](https://www.linkedin.com/in/kyriakos-ververidis/)
 
 ## 📝 License
 This project is open-source and free to use for educational purposes. License: MIT License.
